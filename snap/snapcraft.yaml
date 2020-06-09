@@ -34,6 +34,13 @@ apps:
   barriers:
     command: desktop-launch barriers
     plugs: *plugs
+  barriers-daemon:
+    command: usr/bin/barriers --enable-crypto --display $DISPLAY --debug $LOG_LEVEL --config $SNAP_DATA/barrier.conf --no-daemon
+    environment:
+      DISPLAY: :0
+      LOG_LEVEL: INFO
+    plugs: *plugs
+    daemon: simple
 
 parts:
   desktop-qt5:
