@@ -1,5 +1,5 @@
 name: barrier
-base: core18
+base: core20
 version: master
 version-script: git describe --tags | sed "s/^v//"
 adopt-info: appstream-flathub
@@ -10,7 +10,8 @@ license: GPL-2.0
 
 apps:
   barrier:
-    command: desktop-launch barrier #first run might take longer
+    command-chain: [bin/desktop-launch]
+    command: usr/bin/barrier #first run might take longer
     environment:
       # Fallback to XWayland if running in a Wayland session.
       DISABLE_WAYLAND: 1
@@ -29,10 +30,12 @@ apps:
       - wayland
       - x11
   barrierc:
-    command: desktop-launch barrierc
+    command-chain: [bin/desktop-launch]
+    command: usr/bin/barrierc
     plugs: *plugs
   barriers:
-    command: desktop-launch barriers
+    command-chain: [bin/desktop-launch]
+    command: usr/bin/barriers
     plugs: *plugs
 
 parts:
@@ -45,7 +48,7 @@ parts:
     source: .
     source-type: git
     plugin: cmake
-    configflags:
+    cmake-parameters:
       - "-DCMAKE_INSTALL_PREFIX=/usr"
       - "-DCMAKE_BUILD_TYPE=Release"
     build-packages:
@@ -65,6 +68,7 @@ parts:
       - libavahi-common-dev
       - libqt5svg5-dev
     stage-packages:
+      - libxi6
       - libxinerama1
       - libxrandr2
       - libxrender1
@@ -76,12 +80,6 @@ parts:
       - libavahi-common3
       - libavahi-compat-libdnssd1
     after: [desktop-qt5]
-
-  fix-icon:
-    plugin: nil
-    override-build:
-      sed -i 's|Icon=barrier|Icon=/usr/share/icons/hicolor/scalable/apps/barrier.svg|' $SNAPCRAFT_STAGE/usr/share/applications/barrier.desktop
-    after: [barrier]
 
   appstream-flathub:
     plugin: dump
